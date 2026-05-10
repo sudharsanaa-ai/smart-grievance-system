@@ -159,7 +159,7 @@ const StatusDropdown = ({ complaint, onUpdate }) => {
 
 // ─── Admin Dashboard ─────────────────────────────────────────────────────────
 const AdminDashboard = () => {
-  const { user, token, logout, socket } = useAuth();
+  const { user, logout, socket } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const [activeTab, setActiveTab] = useState('dashboard');
   const [isMobileOpen, setIsMobileOpen] = useState(false);
@@ -196,7 +196,7 @@ const AdminDashboard = () => {
     }
   };
 
-  useEffect(() => { fetchComplaints(page); }, [token, page]);
+  useEffect(() => { fetchComplaints(page); }, [page]);
 
   // Real-time updates via Socket.io
   useEffect(() => {

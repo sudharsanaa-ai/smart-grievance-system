@@ -1,31 +1,38 @@
-const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 
 const protect = async (req, res, next) => {
-  let token;
+  let userId;
 
-  if (
+  if (req.headers['x-user-id']) {
+    userId = req.headers['x-user-id'];
+  } else if (
     req.headers.authorization &&
     req.headers.authorization.startsWith('Bearer')
   ) {
+    // Fallback for some clients that might still use Bearer <userId>
+    userId = req.headers.authorization.split(' ')[1];
+  }
+
+  if (userId) {
     try {
-      // Get token from header
-      token = req.headers.authorization.split(' ')[1];
+      // Find user by userId
+      const user = await User.findOne({ userId: userId.toUpperCase() });
 
-      // Verify token
-      const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your_jwt_secret_here');
+      if (!user) {
+        const err = new Error('Not authorized, user not found');
+        err.statusCode = 401;
+        return next(err);
+      }
 
-      // Get user from the token (exclude password)
-      req.user = await User.findById(decoded.id).select('-password');
-
+      req.user = user;
       next();
     } catch (error) {
-      const err = new Error('Not authorized, token failed');
+      const err = new Error('Not authorized, session failed');
       err.statusCode = 401;
       next(err);
     }
   } else {
-    const err = new Error('Not authorized, no token');
+    const err = new Error('Not authorized, no user ID provided');
     err.statusCode = 401;
     next(err);
   }

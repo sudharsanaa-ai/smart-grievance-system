@@ -1,90 +1,52 @@
-const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 
-// Generate JWT token
-const generateToken = (id, role) => {
-  return jwt.sign({ id, role }, process.env.JWT_SECRET || 'your_jwt_secret_here', {
-    expiresIn: '30d',
-  });
-};
-
-// @desc    Register a new user
-// @route   POST /api/auth/register
-// @access  Public
-const register = async (req, res, next) => {
-  try {
-    const { userId, email, password } = req.body;
-
-    // Check if user exists
-    const userExists = await User.findOne({ $or: [{ email }, { userId: userId.toUpperCase() }] });
-
-    if (userExists) {
-      const error = new Error('User already exists');
-      error.statusCode = 400;
-      throw error;
-    }
-
-    // Create user
-    const user = await User.create({
-      userId,
-      email,
-      password,
-    });
-
-    if (user) {
-      res.status(201).json({
-        status: 'success',
-        data: {
-          _id: user._id,
-          userId: user.userId,
-          email: user.email,
-          role: user.role,
-          token: generateToken(user._id, user.role),
-        },
-      });
-    } else {
-      const error = new Error('Invalid user data');
-      error.statusCode = 400;
-      throw error;
-    }
-  } catch (error) {
-    next(error);
-  }
-};
-
-// @desc    Auth user & get token
+// @desc    Auth user & get session
 // @route   POST /api/auth/login
 // @access  Public
 const login = async (req, res, next) => {
   try {
-    const { email, password } = req.body;
+    const { userId } = req.body;
 
-    // Find user by email
-    const user = await User.findOne({ email }).select('+password');
-
-    // Check password
-    if (user && (await user.matchPassword(password))) {
-      res.json({
-        status: 'success',
-        data: {
-          _id: user._id,
-          userId: user.userId,
-          email: user.email,
-          role: user.role,
-          token: generateToken(user._id, user.role),
-        },
-      });
-    } else {
-      const error = new Error('Invalid email or password');
-      error.statusCode = 401;
+    if (!userId) {
+      const error = new Error('User ID is required');
+      error.statusCode = 400;
       throw error;
     }
+
+    const upperUserId = userId.toUpperCase();
+    
+    // Validate prefix
+    if (!upperUserId.startsWith('STU') && !upperUserId.startsWith('ADM')) {
+      const error = new Error('Invalid User ID format. Must start with STU or ADM');
+      error.statusCode = 400;
+      throw error;
+    }
+
+    // Find user or create a demo user on the fly if it starts with STU or ADM
+    let user = await User.findOne({ userId: upperUserId });
+
+    if (!user) {
+      // For demo purposes, we automatically create the user if the ID is valid prefix-wise
+      user = await User.create({
+        userId: upperUserId
+      });
+    }
+
+    res.json({
+      status: 'success',
+      data: {
+        _id: user._id,
+        userId: user.userId,
+        role: user.role,
+        // No token needed for this simplified version, using userId as identifier
+        token: user.userId 
+      },
+    });
   } catch (error) {
     next(error);
   }
 };
 
 module.exports = {
-  register,
   login,
 };

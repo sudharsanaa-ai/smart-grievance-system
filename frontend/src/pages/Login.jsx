@@ -1,16 +1,14 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { Mail, Lock, User, ArrowRight, ShieldAlert } from 'lucide-react';
+import { User, ArrowRight, ShieldAlert } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 
 import api from '../api/axios';
 
 const Login = () => {
   const [formData, setFormData] = useState({
-    userId: '',
-    email: '',
-    password: ''
+    userId: ''
   });
   const [errors, setErrors] = useState({});
   const [isHovered, setIsHovered] = useState(false);
@@ -27,13 +25,13 @@ const Login = () => {
 
   const validate = () => {
     const newErrors = {};
-    if (!formData.email.trim()) {
-      newErrors.email = 'Email is required';
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      newErrors.email = 'Invalid email format';
-    }
-    if (!formData.password) {
-      newErrors.password = 'Password is required';
+    if (!formData.userId.trim()) {
+      newErrors.userId = 'User ID is required';
+    } else {
+      const upperId = formData.userId.toUpperCase();
+      if (!upperId.startsWith('STU') && !upperId.startsWith('ADM')) {
+        newErrors.userId = 'User ID must start with STU or ADM';
+      }
     }
     
     setErrors(newErrors);
@@ -46,12 +44,11 @@ const Login = () => {
       setIsSubmitting(true);
       try {
         const res = await api.post('/api/auth/login', {
-          email: formData.email,
-          password: formData.password
+          userId: formData.userId
         });
         
         const { data } = res.data;
-        login(data.token);
+        login(data); // Store the whole user object
         
         if (data.role === 'admin') {
           navigate('/admin');
@@ -108,7 +105,7 @@ const Login = () => {
             </AnimatePresence>
 
             <p className="text-gray-400 mt-2 text-sm">
-              Enter your credentials to access the portal
+              Enter your User ID to access the portal
             </p>
           </div>
 
@@ -125,51 +122,11 @@ const Login = () => {
                   value={formData.userId}
                   onChange={handleChange}
                   className={`w-full pl-11 pr-4 py-3 bg-white/5 border ${errors.userId ? 'border-red-500' : 'border-white/10'} rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all text-white placeholder-gray-500`}
-                  placeholder="e.g. STU12345 or ADM001"
+                  placeholder="e.g. STU1234 or ADM001"
                 />
               </div>
               {errors.userId && (
                 <motion.p initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} className="text-red-400 text-xs mt-1 ml-1">{errors.userId}</motion.p>
-              )}
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2 ml-1">Email Address</label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                  <Mail className="h-5 w-5 text-gray-400" />
-                </div>
-                <input
-                  type="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  className={`w-full pl-11 pr-4 py-3 bg-white/5 border ${errors.email ? 'border-red-500' : 'border-white/10'} rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all text-white placeholder-gray-500`}
-                  placeholder="you@example.com"
-                />
-              </div>
-              {errors.email && (
-                <motion.p initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} className="text-red-400 text-xs mt-1 ml-1">{errors.email}</motion.p>
-              )}
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2 ml-1">Password</label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                  <Lock className="h-5 w-5 text-gray-400" />
-                </div>
-                <input
-                  type="password"
-                  name="password"
-                  value={formData.password}
-                  onChange={handleChange}
-                  className={`w-full pl-11 pr-4 py-3 bg-white/5 border ${errors.password ? 'border-red-500' : 'border-white/10'} rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all text-white placeholder-gray-500`}
-                  placeholder="••••••••"
-                />
-              </div>
-              {errors.password && (
-                <motion.p initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} className="text-red-400 text-xs mt-1 ml-1">{errors.password}</motion.p>
               )}
             </div>
 
@@ -178,10 +135,11 @@ const Login = () => {
               whileTap={{ scale: 0.98 }}
               onHoverStart={() => setIsHovered(true)}
               onHoverEnd={() => setIsHovered(false)}
+              disabled={isSubmitting}
               type="submit"
-              className="w-full py-3 px-4 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white rounded-xl font-medium shadow-lg shadow-blue-500/25 flex items-center justify-center group transition-all"
+              className="w-full py-3 px-4 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white rounded-xl font-medium shadow-lg shadow-blue-500/25 flex items-center justify-center group transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <span>Sign In</span>
+              <span>{isSubmitting ? 'Signing In...' : 'Sign In'}</span>
               <motion.div
                 animate={{ x: isHovered ? 5 : 0 }}
                 transition={{ type: "spring", stiffness: 300 }}

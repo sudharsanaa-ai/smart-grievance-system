@@ -1,6 +1,6 @@
 const Complaint = require('../models/Complaint');
 const { checkSimilarity } = require('../utils/priorityUtils');
-const sendEmail = require('../utils/email');
+
 
 // @desc    Create a new complaint
 // @route   POST /api/complaints
@@ -113,7 +113,7 @@ const getAllComplaints = async (req, res, next) => {
 
     const total = await Complaint.countDocuments({});
     const complaints = await Complaint.find({})
-      .populate('user', 'userId email')
+      .populate('user', 'userId')
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit)
@@ -152,7 +152,7 @@ const updateComplaintStatus = async (req, res, next) => {
       req.params.id,
       { status },
       { new: true, runValidators: true }
-    ).populate('user', 'userId email');
+    ).populate('user', 'userId');
 
     if (!complaint) {
       const err = new Error('Complaint not found');
@@ -171,32 +171,7 @@ const updateComplaintStatus = async (req, res, next) => {
       io.emit('complaintUpdated', complaint);
     }
 
-    // Email notification on resolution
-    if (status === 'Resolved' && complaint.user.email) {
-      try {
-        await sendEmail({
-          email: complaint.user.email,
-          subject: `Complaint Resolved: ${complaint.complaintId}`,
-          message: `Your complaint "${complaint.subject}" (ID: ${complaint.complaintId}) has been marked as Resolved.`,
-          html: `
-            <div style="font-family: sans-serif; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
-              <h2 style="color: #10b981;">Grievance Resolved!</h2>
-              <p>Hello,</p>
-              <p>We are pleased to inform you that your grievance has been resolved by the administrator.</p>
-              <div style="background: #f9fafb; padding: 15px; border-radius: 8px; margin: 20px 0;">
-                <p style="margin: 0;"><strong>Complaint ID:</strong> ${complaint.complaintId}</p>
-                <p style="margin: 5px 0;"><strong>Subject:</strong> ${complaint.subject}</p>
-                <p style="margin: 0;"><strong>Status:</strong> <span style="color: #10b981; font-weight: bold;">Resolved</span></p>
-              </div>
-              <p>Thank you for using the Smart Grievance Management System.</p>
-            </div>
-          `
-        });
-      } catch (emailError) {
-        console.error('Email failed to send:', emailError);
-        // We don't want to fail the whole request if email fails
-      }
-    }
+
 
     res.status(200).json({
       status: 'success',
@@ -212,7 +187,7 @@ const updateComplaintStatus = async (req, res, next) => {
 // @access  Private
 const getComplaintById = async (req, res, next) => {
   try {
-    const complaint = await Complaint.findById(req.params.id).populate('user', 'userId email');
+    const complaint = await Complaint.findById(req.params.id).populate('user', 'userId');
 
     if (!complaint) {
       const err = new Error('Complaint not found');

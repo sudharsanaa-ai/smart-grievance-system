@@ -5,12 +5,14 @@ const api = axios.create({
   baseURL: API_URL,
 });
 
-// Request interceptor to add JWT token
+// Request interceptor to add User ID header
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+    const user = JSON.parse(localStorage.getItem('user'));
+    if (user && user.userId) {
+      config.headers['x-user-id'] = user.userId;
+      // Also keep Authorization header for compatibility with some backends
+      config.headers.Authorization = `Bearer ${user.userId}`;
     }
     return config;
   },
@@ -24,8 +26,7 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response && error.response.status === 401) {
-      // Optional: Clear token and redirect to login if unauthorized
-      localStorage.removeItem('token');
+      localStorage.removeItem('user');
       window.location.href = '/login';
     }
     return Promise.reject(error);

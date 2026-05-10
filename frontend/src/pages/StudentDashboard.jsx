@@ -162,7 +162,7 @@ const DashboardOverview = ({ user }) => (
 );
 
 const RaiseComplaint = () => {
-  const { token } = useAuth();
+  const { user } = useAuth();
   const [formData, setFormData] = useState({
     category: '',
     priority: 'medium',
@@ -399,7 +399,7 @@ const RaiseComplaint = () => {
 };
 
 const ComplaintStatus = () => {
-  const { token, socket } = useAuth();
+  const { socket } = useAuth();
   const [complaints, setComplaints] = useState([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
@@ -420,7 +420,7 @@ const ComplaintStatus = () => {
 
   useEffect(() => {
     fetchComplaints(page);
-  }, [token, page]);
+  }, [page]);
 
   // Real-time updates via Socket.io
   useEffect(() => {
