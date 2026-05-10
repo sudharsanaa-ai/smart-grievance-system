@@ -24,7 +24,11 @@ app.use('/api', limiter);
 
 // Middleware
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+  origin: [
+    'https://smart-grievance-system-delta.vercel.app',
+    'http://localhost:5173',
+    'http://localhost:3000'
+  ],
   credentials: true
 }));
 app.use(express.json({ limit: '10kb' })); // Body parser, limiting data size
