@@ -322,9 +322,10 @@ const AdminDashboard = () => {
           <div className="w-8 h-8 bg-indigo-500/30 rounded-full flex items-center justify-center">
             <Users className="w-4 h-4 text-indigo-300" />
           </div>
-          <div className="text-sm">
-            <p className="font-medium text-gray-200">{user?.userId || 'Admin'}</p>
-            <p className="text-xs text-indigo-400">Administrator</p>
+          <div className="text-sm overflow-hidden">
+            <p className="font-medium text-gray-200 truncate">{user?.userId || 'Admin'}</p>
+            <p className="text-[10px] text-gray-400 truncate">{user?.email}</p>
+            <p className="text-[10px] text-indigo-400 font-semibold mt-0.5">Administrator</p>
           </div>
         </div>
         <button

@@ -5,10 +5,10 @@ const User = require('../models/User');
 // @access  Public
 const login = async (req, res, next) => {
   try {
-    const { userId } = req.body;
+    const { userId, email } = req.body;
 
-    if (!userId) {
-      const error = new Error('User ID is required');
+    if (!userId || !email) {
+      const error = new Error('User ID and Email are required');
       error.statusCode = 400;
       throw error;
     }
@@ -22,14 +22,18 @@ const login = async (req, res, next) => {
       throw error;
     }
 
-    // Find user or create a demo user on the fly if it starts with STU or ADM
+    // Find user or create/update them to ensure email is stored for notifications
     let user = await User.findOne({ userId: upperUserId });
 
     if (!user) {
-      // For demo purposes, we automatically create the user if the ID is valid prefix-wise
       user = await User.create({
-        userId: upperUserId
+        userId: upperUserId,
+        email: email.toLowerCase()
       });
+    } else {
+      // Update email in case it changed
+      user.email = email.toLowerCase();
+      await user.save();
     }
 
     res.json({
@@ -37,8 +41,8 @@ const login = async (req, res, next) => {
       data: {
         _id: user._id,
         userId: user.userId,
+        email: user.email,
         role: user.role,
-        // No token needed for this simplified version, using userId as identifier
         token: user.userId 
       },
     });

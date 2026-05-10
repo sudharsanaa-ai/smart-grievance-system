@@ -17,6 +17,7 @@ const validate = (req, res, next) => {
 const loginRules = () => {
   return [
     body('userId').notEmpty().withMessage('User ID is required'),
+    body('email').isEmail().withMessage('Please provide a valid email'),
   ];
 };
 

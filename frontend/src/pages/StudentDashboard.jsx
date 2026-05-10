@@ -62,7 +62,8 @@ const DashboardOverview = ({ user }) => (
         <h2 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-green-400 to-emerald-500">
           Welcome back, {user?.userId || 'Student'}!
         </h2>
-        <p className="text-gray-400">Here's an overview of your recent activity.</p>
+        <p className="text-gray-400 font-medium">{user?.email}</p>
+        <p className="text-gray-500 text-sm">Here's an overview of your recent activity.</p>
       </div>
       <button className="relative p-2 rounded-full bg-white/5 border border-white/10 hover:bg-white/10 transition-colors">
         <Bell className="w-5 h-5 text-gray-300" />

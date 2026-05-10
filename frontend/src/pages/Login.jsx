@@ -1,14 +1,15 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { User, ArrowRight, ShieldAlert } from 'lucide-react';
+import { User, Mail, ArrowRight, ShieldAlert } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 
 import api from '../api/axios';
 
 const Login = () => {
   const [formData, setFormData] = useState({
-    userId: ''
+    userId: '',
+    email: ''
   });
   const [errors, setErrors] = useState({});
   const [isHovered, setIsHovered] = useState(false);
@@ -33,6 +34,12 @@ const Login = () => {
         newErrors.userId = 'User ID must start with STU or ADM';
       }
     }
+
+    if (!formData.email.trim()) {
+      newErrors.email = 'Email is required';
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      newErrors.email = 'Invalid email format';
+    }
     
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -44,7 +51,8 @@ const Login = () => {
       setIsSubmitting(true);
       try {
         const res = await api.post('/api/auth/login', {
-          userId: formData.userId
+          userId: formData.userId,
+          email: formData.email
         });
         
         const { data } = res.data;
@@ -105,7 +113,7 @@ const Login = () => {
             </AnimatePresence>
 
             <p className="text-gray-400 mt-2 text-sm">
-              Enter your User ID to access the portal
+              Enter your credentials to access the portal
             </p>
           </div>
 
@@ -127,6 +135,26 @@ const Login = () => {
               </div>
               {errors.userId && (
                 <motion.p initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} className="text-red-400 text-xs mt-1 ml-1">{errors.userId}</motion.p>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2 ml-1">Email Address</label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                  <Mail className="h-5 w-5 text-gray-400" />
+                </div>
+                <input
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  className={`w-full pl-11 pr-4 py-3 bg-white/5 border ${errors.email ? 'border-red-500' : 'border-white/10'} rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all text-white placeholder-gray-500`}
+                  placeholder="you@example.com"
+                />
+              </div>
+              {errors.email && (
+                <motion.p initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} className="text-red-400 text-xs mt-1 ml-1">{errors.email}</motion.p>
               )}
             </div>
 
