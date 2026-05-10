@@ -2,7 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
-const xss = require('xss-clean');
+
 const hpp = require('hpp');
 const errorHandler = require('./middleware/errorMiddleware');
 
@@ -30,8 +30,7 @@ app.use(cors({
 app.use(express.json({ limit: '10kb' })); // Body parser, limiting data size
 app.use(express.urlencoded({ extended: true, limit: '10kb' }));
 
-// Data sanitization against XSS
-app.use(xss());
+
 
 // Prevent HTTP parameter pollution
 app.use(hpp());
