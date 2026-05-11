@@ -6,10 +6,13 @@ const validate = (req, res, next) => {
     return next();
   }
   const extractedErrors = [];
-  errors.array().map(err => extractedErrors.push({ [err.path]: err.msg }));
+  errors.array().forEach(err => {
+    extractedErrors.push({ [err.path || err.param]: err.msg });
+  });
 
   return res.status(422).json({
     success: false,
+    error: extractedErrors[0] ? Object.values(extractedErrors[0])[0] : 'Validation Error',
     errors: extractedErrors,
   });
 };

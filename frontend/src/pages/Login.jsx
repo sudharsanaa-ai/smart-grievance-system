@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { User, Mail, ArrowRight, ShieldAlert } from 'lucide-react';
+import { User, Mail, ArrowRight, ShieldAlert, ShieldCheck } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 
 import api from '../api/axios';
@@ -91,12 +91,12 @@ const Login = () => {
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
-              className="w-16 h-16 bg-gradient-to-tr from-blue-500 to-purple-500 rounded-2xl mx-auto mb-4 flex items-center justify-center shadow-lg"
+              className="w-20 h-20 bg-gradient-to-tr from-blue-600 via-indigo-500 to-purple-600 rounded-2xl mx-auto mb-6 flex items-center justify-center shadow-[0_10px_25px_-5px_rgba(59,130,246,0.5)] border border-white/20"
             >
-              <ShieldAlert className="w-8 h-8 text-white" />
+              <ShieldCheck className="w-10 h-10 text-white" />
             </motion.div>
-            <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-400">
-              Welcome Back
+            <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-blue-400 via-indigo-300 to-purple-400 leading-tight">
+              Smart Complaint Management System
             </h1>
             <AnimatePresence>
               {errors.global && (
@@ -104,16 +104,16 @@ const Login = () => {
                   initial={{ opacity: 0, height: 0 }}
                   animate={{ opacity: 1, height: 'auto' }}
                   exit={{ opacity: 0, height: 0 }}
-                  className="bg-red-500/20 border border-red-500/50 text-red-200 p-3 rounded-xl text-sm mb-6 flex items-center gap-2"
+                  className="bg-red-500/10 border border-red-500/20 text-red-400 p-4 rounded-2xl text-sm mb-6 flex items-center gap-3 mt-6 text-left"
                 >
-                  <ShieldAlert className="w-4 h-4 flex-shrink-0" />
-                  {errors.global}
+                  <ShieldAlert className="w-5 h-5 flex-shrink-0" />
+                  <p className="font-medium">{errors.global}</p>
                 </motion.div>
               )}
             </AnimatePresence>
 
-            <p className="text-gray-400 mt-2 text-sm">
-              Enter your credentials to access the portal
+            <p className="text-gray-400 mt-4 text-sm font-medium">
+              Secure Access Portal
             </p>
           </div>
 
