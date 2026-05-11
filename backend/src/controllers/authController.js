@@ -7,19 +7,29 @@ const login = async (req, res, next) => {
   try {
     const { userId, email } = req.body;
 
+    // Simple manual validation to avoid middleware chain issues
     if (!userId || !email) {
-      const error = new Error('User ID and Email are required');
-      error.statusCode = 400;
-      throw error;
+      return res.status(422).json({
+        success: false,
+        error: 'User ID and Email are required'
+      });
+    }
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      return res.status(422).json({
+        success: false,
+        error: 'Please provide a valid email'
+      });
     }
 
     const upperUserId = userId.toUpperCase();
     
     // Validate prefix
     if (!upperUserId.startsWith('STU') && !upperUserId.startsWith('ADM')) {
-      const error = new Error('Invalid User ID format. Must start with STU or ADM');
-      error.statusCode = 400;
-      throw error;
+      return res.status(422).json({
+        success: false,
+        error: 'Invalid User ID format. Must start with STU or ADM'
+      });
     }
 
     // Find user or create/update them to ensure email is stored for notifications
