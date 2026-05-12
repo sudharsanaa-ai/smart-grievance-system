@@ -51,22 +51,31 @@ const Login = () => {
       setIsSubmitting(true);
       try {
         const res = await api.post('/api/auth/login', {
-          userId: formData.userId,
-          email: formData.email
+          userId: formData.userId.trim().toUpperCase(),
+          email: formData.email.trim().toLowerCase()
         });
-        
-        const { data } = res.data;
-        login(data); // Store the whole user object
-        
-        if (data.role === 'admin') {
+
+        // Handle both response formats: {success, data} and {status, data}
+        const responseData = res.data;
+        const userData = responseData.data;
+
+        if (!userData) {
+          throw new Error('Invalid response from server');
+        }
+
+        login(userData); // Store in localStorage via AuthContext
+
+        // Navigate based on role prefix (fallback if role field missing)
+        const role = userData.role || (userData.userId?.startsWith('ADM') ? 'admin' : 'student');
+
+        if (role === 'admin') {
           navigate('/admin');
         } else {
           navigate('/student');
         }
       } catch (err) {
-        setErrors({ 
-          global: err.response?.data?.error || 'Login failed - server unreachable' 
-        });
+        const errorMsg = err.response?.data?.error || err.message || 'Login failed - server unreachable';
+        setErrors({ global: errorMsg });
       } finally {
         setIsSubmitting(false);
       }
