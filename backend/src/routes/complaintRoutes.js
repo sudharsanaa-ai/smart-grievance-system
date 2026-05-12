@@ -9,24 +9,21 @@ const {
 } = require('../controllers/complaintController');
 const { protect, authorize } = require('../middleware/authMiddleware');
 const { upload } = require('../config/cloudinary');
-const { complaintRules, validate } = require('../middleware/validatorMiddleware');
 
 const router = express.Router();
 
-// Publicly accessible to logged in users (Student & Admin)
+// Student & Admin: get/create complaints
 router.route('/')
   .get(protect, getMyComplaints)
-  .post(protect, upload.array('attachments', 5), complaintRules(), validate, createComplaint);
+  .post(protect, upload.array('attachments', 5), createComplaint);
 
 // Admin only routes
 router.get('/all', protect, authorize('admin'), getAllComplaints);
 router.patch('/:id/status', protect, authorize('admin'), updateComplaintStatus);
 
-// Routes for specific complaint
+// Specific complaint routes
 router.route('/:id')
   .get(protect, getComplaintById)
   .delete(protect, deleteComplaint);
 
 module.exports = router;
-
-
