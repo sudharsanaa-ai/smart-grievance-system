@@ -11,17 +11,6 @@ const app = express();
 // Trust proxy for rate limiting (needed for Render/Vercel)
 app.set('trust proxy', 1);
 
-// Set security HTTP headers
-app.use(helmet());
-
-// Limit requests from same API
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // limit each IP to 100 requests per windowMs
-  message: 'Too many requests from this IP, please try again after 15 minutes'
-});
-app.use('/api', limiter);
-
 // Middleware
 app.use(cors({
   origin: [
@@ -31,8 +20,15 @@ app.use(cors({
   ],
   credentials: true
 }));
-app.use(express.json({ limit: '10kb' })); // Body parser, limiting data size
+app.use(express.json({ limit: '10kb' })); 
 app.use(express.urlencoded({ extended: true, limit: '10kb' }));
+
+// Set security HTTP headers
+app.use(helmet());
+
+// Limit requests from same API (Disabled for debugging)
+// const limiter = rateLimit({ ... });
+// app.use('/api', limiter);
 
 
 
