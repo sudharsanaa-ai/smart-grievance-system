@@ -23,9 +23,8 @@ const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
     origin: [
-      'https://smart-grievance-system-delta.vercel.app',
       'http://localhost:5173',
-      'http://localhost:3000'
+      'https://smart-grievance-system-ix31.vercel.app'
     ],
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
     credentials: true

@@ -8,14 +8,11 @@ const app = express();
 // CORS — must be first
 app.use(cors({
   origin: [
-    'https://smart-grievance-system-delta.vercel.app',
-    'http://localhost:5173',
-    'http://localhost:3000'
+    "http://localhost:5173",
+    "https://smart-grievance-system-ix31.vercel.app"
   ],
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'x-user-id']
-}));
+  credentials: true
+}))
 
 // Body parsers
 app.use(express.json({ limit: '10kb' }));
