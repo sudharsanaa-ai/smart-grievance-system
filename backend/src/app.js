@@ -23,6 +23,11 @@ app.get('/api/health', (req, res) => {
   res.status(200).json({ status: 'success', message: 'API is running' });
 });
 
+// Root route
+app.get("/", (req, res) => {
+  res.send("Smart Grievance Backend Running");
+});
+
 // API Routes
 const authRoutes = require('./routes/authRoutes');
 const complaintRoutes = require('./routes/complaintRoutes');
