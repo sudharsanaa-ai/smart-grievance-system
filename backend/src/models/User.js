@@ -25,7 +25,7 @@ const userSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 // Pre-save middleware to assign role based on userId prefix
-userSchema.pre('save', function (next) {
+userSchema.pre('save', function () {
   if (this.isModified('userId') || this.isNew) {
     if (this.userId.startsWith('ADM')) {
       this.role = 'admin';
@@ -33,7 +33,6 @@ userSchema.pre('save', function (next) {
       this.role = 'student';
     }
   }
-  next();
 });
 
 const User = mongoose.model('User', userSchema);
