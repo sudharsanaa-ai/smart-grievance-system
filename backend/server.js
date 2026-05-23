@@ -22,10 +22,13 @@ const server = http.createServer(app);
 // Socket.io initialization
 const io = new Server(server, {
   cors: {
-    origin: [
-      'http://localhost:5173',
-      'https://smart-grievance-system-ix31.vercel.app'
-    ],
+    origin: (origin, callback) => {
+      if (!origin || origin.startsWith('http://localhost') || origin.includes('vercel.app')) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
     credentials: true
   },
